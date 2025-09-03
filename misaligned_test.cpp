@@ -3,20 +3,15 @@
 #include <vector>
 #include <string>
 
-// ===================================================
-// Test setup
-// ===================================================
-
-// Global container to capture output
+// Stores captured lines from printColorMap()
 static std::vector<std::string> capturedLines;
 
-// Capture function to be passed to printColorMap()
-// Instead of printing to console, we store each line in capturedLines.
+// Capture output instead of printing to console
 void captureOutput(const std::string& line) {
     capturedLines.push_back(line);
 }
 
-// Helper: generate the CORRECT expected output (ground truth)
+// Expected correct output (ground truth)
 std::vector<std::string> generateExpectedOutput() {
     const char* majorColor[] = {"White", "Red", "Black", "Yellow", "Violet"};
     const char* minorColor[] = {"Blue", "Orange", "Green", "Brown", "Slate"};
@@ -32,19 +27,16 @@ std::vector<std::string> generateExpectedOutput() {
     return expected;
 }
 
-// ===================================================
-// Unit tests (GoogleTest)
-// ===================================================
+// ---------- Tests ----------
 
-// Test 1: Verify that the count is correct (should be 25)
+// Test 1: Check total count
 TEST(ColorMapTest, CountIsCorrect) {
     capturedLines.clear();
     int count = printColorMap(captureOutput);
     EXPECT_EQ(count, 25);
 }
 
-// Test 2: Verify that every generated line matches the expected output
-// This will FAIL because of the bug (minorColor[i] vs minorColor[j]).
+// Test 2: Compare full output (should fail due to bug)
 TEST(ColorMapTest, LinesMatchExpected) {
     capturedLines.clear();
     printColorMap(captureOutput);
@@ -52,24 +44,17 @@ TEST(ColorMapTest, LinesMatchExpected) {
     EXPECT_EQ(capturedLines, expected);
 }
 
-// Test 3: Spot-check specific entries
-// The first entry will pass, but the last entry will FAIL.
+// Test 3: Spot-check first and last entry
 TEST(ColorMapTest, FirstAndLastEntries) {
     capturedLines.clear();
     printColorMap(captureOutput);
 
     ASSERT_EQ(capturedLines.size(), 25);
-
-    // First entry should be correct
-    EXPECT_EQ(capturedLines.front(), "1 | White | Blue");
-
-    // Last entry should be correct (but will fail due to bug)
-    EXPECT_EQ(capturedLines.back(), "25 | Violet | Slate");
+    EXPECT_EQ(capturedLines.front(), "1 | White | Blue");      // should pass
+    EXPECT_EQ(capturedLines.back(), "25 | Violet | Slate");    // will fail
 }
 
-// ===================================================
-// Test runner
-// ===================================================
+// Run all tests
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
